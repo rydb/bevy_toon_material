@@ -8,6 +8,10 @@ struct ToonMaterial {
     light_color: vec4<f32>,
     camera_position: vec3<f32>,
     ambient_color: vec4<f32>,
+    rim_amount: f32,
+    rim_color: vec4<f32>,
+    rim_threshold: f32,
+    band_count: u32
 };
 
 @group(2) @binding(0) var<uniform> material: ToonMaterial;
@@ -17,14 +21,20 @@ fn fragment(input: VertexOutput) -> @location(0) vec4<f32> {
     // shading the object
     let normal = normalize(input.world_normal); // make the world_normal of the input mesh have a length of one
     let n_dot_l = dot(material.light_direction, normal) ;
-    var light_intensity = smoothstep(0.0, 0.01, n_dot_l); // smooth out the harsh shadow a little
-    // if n_dot_l > 0.0 {
-    //     let bands = 1.0;
-    //     var x = round(n_dot_l * bands);
-    //     light_intensity = x / bands;
-    // } else {
-    //     light_intensity = 0.0;
-    // }
+    var light_intensity = 0.0;
+
+    // if we want bands, create bands, otherwise use smooth lighting
+    if material.band_count > 0 {
+        if n_dot_l > 0.0 {
+            var x = round(n_dot_l * f32(material.band_count));
+            light_intensity = x / f32(material.band_count);
+        } else {
+            light_intensity = 0.0;
+        }
+    } else {
+        light_intensity = smoothstep(0.0, 0.01, n_dot_l);
+    }
+   
 
     let light = (light_intensity * material.light_color);
 
@@ -39,13 +49,10 @@ fn fragment(input: VertexOutput) -> @location(0) vec4<f32> {
     let specular = spec_intensity_smooth * spec_color;
 
     // rim lighting
-    let rim_color = vec4<f32>(1.0);
-    let rim_amount = 0.716; // float between 0 and 1
     let rim_dot = 1 - dot(view_direction, normal);
-    let rim_threshold = 0.1; // float between 0 and 1
-    var rim_intensity = rim_dot * pow(n_dot_l, rim_threshold);
-    rim_intensity = smoothstep(rim_amount - 0.01, rim_amount + 0.01, rim_intensity);
-    let rim = rim_intensity * rim_color;
+    var rim_intensity = rim_dot * pow(n_dot_l, material.rim_threshold);
+    rim_intensity = smoothstep(material.rim_amount - 0.01, material.rim_amount + 0.01, rim_intensity);
+    let rim = rim_intensity * material.rim_color;
 
     return material.base_color * (material.ambient_color + light + specular + rim);
 }

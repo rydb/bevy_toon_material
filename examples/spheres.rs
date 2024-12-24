@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use toon_shader::*;
+use bevy_toon_material::*;
 
 fn main() {
     App::new()
@@ -14,7 +14,6 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut toon: ResMut<Assets<ToonShader>>,
     mut standard: ResMut<Assets<StandardMaterial>>,
-    asset_server: Res<AssetServer>,
 ) {
     // spawn camera
     cmd.spawn((
@@ -23,29 +22,28 @@ fn setup(
             hdr: true,
             ..default()
         },
-        Transform::from_xyz(0.0, 40.0, 100.0).looking_at(Vec3::ZERO, Vec3::Y),
+        Transform::from_xyz(0.0, 40.0, 60.0).looking_at(Vec3::ZERO, Vec3::Y),
         ToonCamera,
     ));
 
-    // shade your models smooth! it looks way better
-    // let monkey_smooth = asset_server.load("monkey.glb#Mesh0/Primitive0");
-    // let monkey_flat = asset_server.load("monkey_flat.glb#Mesh0/Primitive0");
-
     let toon_mat_r = toon.add(ToonShader {
-        base_color: Color::linear_rgb(1.0, 0.0, 0.0).into(),
+        base_color: Color::linear_rgb(0.9, 0.05, 0.05).into(),
         ambient_color: Color::linear_rgba(0.1, 0.1, 0.1, 1.0).into(),
+        band_count: 0,
         ..default()
     });
 
     let toon_mat_g = toon.add(ToonShader {
-        base_color: Color::linear_rgb(0.0, 1.0, 0.0).into(),
+        base_color: Color::linear_rgb(0.05, 0.9, 0.05).into(),
         ambient_color: Color::linear_rgba(0.1, 0.1, 0.1, 1.0).into(),
+        band_count: 2,
         ..default()
     });
 
     let toon_mat_b = toon.add(ToonShader {
-        base_color: Color::linear_rgb(0.0, 0.0, 1.0).into(),
+        base_color: Color::linear_rgb(0.05, 0.05, 0.9).into(),
         ambient_color: Color::linear_rgba(0.1, 0.1, 0.1, 1.0).into(),
+        band_count: 3,
         ..default()
     });
 

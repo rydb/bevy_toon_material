@@ -1120,6 +1120,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_toon_material"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "bevy_transform"
 version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3796,13 +3803,6 @@ dependencies = [
  "indexmap",
  "toml_datetime",
  "winnow",
-]
-
-[[package]]
-name = "toon_shader"
-version = "0.1.0"
-dependencies = [
- "bevy",
 ]
 
 [[package]]

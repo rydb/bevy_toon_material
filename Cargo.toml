@@ -1,7 +1,8 @@
 [package]
-name = "toon_shader"
+name = "bevy_toon_material"
 version = "0.1.0"
 edition = "2024"
+license = "MIT Or Apache-2.0"
 
 [dependencies]
-bevy = {version = "0.15.0", features = ["dynamic_linking"] }
+bevy = {version = "0.15.0", features = ["dynamic_linking"]}
