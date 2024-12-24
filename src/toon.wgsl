@@ -2,16 +2,21 @@
 // And https://roystan.net/articles/toon-shader/
 #import bevy_pbr::forward_io::VertexOutput
 
-@group(2) @binding(0) var<uniform> material_color: vec4<f32>;
-@group(2) @binding(1) var<uniform> light_direction: vec3<f32>;
-@group(2) @binding(2) var<uniform> light_color: vec4<f32>;
-@group(2) @binding(3) var<uniform> camera_position: vec3<f32>;
+struct ToonMaterial {
+    base_color: vec4<f32>,
+    light_direction: vec3<f32>,
+    light_color: vec4<f32>,
+    camera_position: vec3<f32>,
+    ambient_color: vec4<f32>,
+};
+
+@group(2) @binding(0) var<uniform> material: ToonMaterial;
 
 @fragment
 fn fragment(input: VertexOutput) -> @location(0) vec4<f32> {
     // shading the object
     let normal = normalize(input.world_normal); // make the world_normal of the input mesh have a length of one
-    let n_dot_l = dot(light_direction, normal) ;
+    let n_dot_l = dot(material.light_direction, normal) ;
     var light_intensity = smoothstep(0.0, 0.01, n_dot_l); // smooth out the harsh shadow a little
     // if n_dot_l > 0.0 {
     //     let bands = 1.0;
@@ -21,12 +26,11 @@ fn fragment(input: VertexOutput) -> @location(0) vec4<f32> {
     //     light_intensity = 0.0;
     // }
 
-    let ambient_light = vec4<f32>(0.1, 0.1, 0.1, 1.0); // could be anything
-    let light = (light_intensity * light_color);
+    let light = (light_intensity * material.light_color);
 
     // specular 
-    let view_direction = normalize(camera_position - input.world_position.xyz);
-    let half_vector = normalize(light_direction + view_direction);
+    let view_direction = normalize(material.camera_position - input.world_position.xyz);
+    let half_vector = normalize(material.light_direction + view_direction);
     let n_dot_h = dot(normal, half_vector);
     let spec_color = vec4<f32>(0.9, 0.9, 0.9, 1.0);
     let glossiness = 32.0;
@@ -43,5 +47,5 @@ fn fragment(input: VertexOutput) -> @location(0) vec4<f32> {
     rim_intensity = smoothstep(rim_amount - 0.01, rim_amount + 0.01, rim_intensity);
     let rim = rim_intensity * rim_color;
 
-    return material_color * (ambient_light + light + specular + rim);
+    return material.base_color * (material.ambient_color + light + specular + rim);
 }
