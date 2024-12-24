@@ -35,13 +35,13 @@ fn setup(
         ToonCamera,
     ));
 
-    let toon_mat = toon.add(ToonShader::default);
+    let toon_mat = toon.add(ToonShader::default());
 
     // spawn a sphere and apply the material
     cmd.spawn((
         Mesh3d(meshes.add(Sphere::new(5.0))),
         MeshMaterial3d(toon_mat.clone()),
-        Transform::from_xyz(-15.0, 0.0, 0.0),
+        Transform::from_xyz(0.0, 0.0, 0.0),
     ));
 
     // spawn directional light with a ToonLight component
@@ -84,6 +84,6 @@ cargo run --example example_file_name
 
 | Bevy | bevy_toon_material |
 |---|---|
-| 0.15 | 0.15 |
+| 0.15 | 0.1 |
 
 ![Spheres Example](image.png)
