@@ -78,7 +78,7 @@ cargo run --example example_file_name
 
 ## Credit
 - An existing toon shader implementation that is unfortunately a little out of date: [bevy_toon_shader](https://github.com/tbillington/bevy_toon_shader)
-- An easily-to-follow toon shader tutorial for the Unity game engine: 
+- An easily-to-follow toon shader tutorial for the Unity game engine: https://roystan.net/articles/toon-shader/
 
 ## Bevy version support
 
