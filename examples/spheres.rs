@@ -12,7 +12,7 @@ fn main() {
 fn setup(
     mut cmd: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut toon: ResMut<Assets<ToonShader>>,
+    mut toon: ResMut<Assets<ToonMaterial>>,
     mut standard: ResMut<Assets<StandardMaterial>>,
 ) {
     // spawn camera
@@ -26,44 +26,52 @@ fn setup(
         ToonCamera,
     ));
 
-    let toon_mat_r = toon.add(ToonShader {
+    let toon_mat_r = toon.add(ToonMaterial {
         base_color: Color::linear_rgb(0.9, 0.05, 0.05).into(),
         ambient_color: Color::linear_rgba(0.1, 0.1, 0.1, 1.0).into(),
         band_count: 0,
         ..default()
     });
 
-    let toon_mat_g = toon.add(ToonShader {
+    let toon_mat_g = toon.add(ToonMaterial {
         base_color: Color::linear_rgb(0.05, 0.9, 0.05).into(),
         ambient_color: Color::linear_rgba(0.1, 0.1, 0.1, 1.0).into(),
         band_count: 2,
         ..default()
     });
 
-    let toon_mat_b = toon.add(ToonShader {
+    let toon_mat_b = toon.add(ToonMaterial {
         base_color: Color::linear_rgb(0.05, 0.05, 0.9).into(),
         ambient_color: Color::linear_rgba(0.1, 0.1, 0.1, 1.0).into(),
         band_count: 3,
         ..default()
     });
 
+    let toon_mat_default = toon.add(ToonMaterial::default());
+
     // spawn spheres to demonstrate material with different colors
     cmd.spawn((
         Mesh3d(meshes.add(Sphere::new(5.0))),
         MeshMaterial3d(toon_mat_r.clone()),
-        Transform::from_xyz(-15.0, 0.0, 0.0),
+        Transform::from_xyz(-25.0, 0.0, 0.0),
     ));
 
     cmd.spawn((
         Mesh3d(meshes.add(Sphere::new(5.0))),
         MeshMaterial3d(toon_mat_g.clone()),
-        Transform::from_xyz(0.0, 0.0, 0.0),
+        Transform::from_xyz(-10.0, 0.0, 0.0),
     ));
 
     cmd.spawn((
         Mesh3d(meshes.add(Sphere::new(5.0))),
         MeshMaterial3d(toon_mat_b.clone()),
-        Transform::from_xyz(15.0, 0.0, 0.0),
+        Transform::from_xyz(5.0, 0.0, 0.0),
+    ));
+
+    cmd.spawn((
+        Mesh3d(meshes.add(Sphere::new(5.0))),
+        MeshMaterial3d(toon_mat_default.clone()),
+        Transform::from_xyz(20.0, 0.0, 0.0),
     ));
 
     // spawn light that affects shader

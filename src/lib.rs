@@ -10,7 +10,7 @@ pub struct ToonShaderPlugin;
 impl Plugin for ToonShaderPlugin {
     fn build(&self, app: &mut App) {
         load_internal_asset!(app, TOON_SHADER_HANDLE, "toon.wgsl", Shader::from_wgsl);
-        app.add_plugins(MaterialPlugin::<ToonShader>::default())
+        app.add_plugins(MaterialPlugin::<ToonMaterial>::default())
             .add_systems(Update, update_shader);
     }
 }
@@ -23,7 +23,7 @@ pub struct ToonCamera;
 
 #[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
 #[uniform(0, ToonShaderUniform)]
-pub struct ToonShader {
+pub struct ToonMaterial {
     pub base_color: LinearRgba,
     pub light_direction: Vec3,
     pub light_color: LinearRgba,
@@ -33,6 +33,9 @@ pub struct ToonShader {
     pub rim_color: LinearRgba,
     pub rim_threshold: f32,
     pub band_count: u32,
+    #[texture(1)]
+    #[sampler(2)]
+    pub texture: Option<Handle<Image>>,
 }
 
 #[derive(Default, Clone, ShaderType)]
@@ -48,15 +51,23 @@ pub struct ToonShaderUniform {
     pub band_count: u32,
 }
 
-impl Material for ToonShader {
+impl Material for ToonMaterial {
     fn fragment_shader() -> ShaderRef {
         TOON_SHADER_HANDLE.into()
     }
+    fn specialize(
+        _pipeline: &bevy::pbr::MaterialPipeline<Self>,
+        _descriptor: &mut bevy::render::render_resource::RenderPipelineDescriptor,
+        _layout: &bevy::render::mesh::MeshVertexBufferLayoutRef,
+        _key: bevy::pbr::MaterialPipelineKey<Self>,
+    ) -> Result<(), bevy::render::render_resource::SpecializedMeshPipelineError> {
+        Ok(())
+    }
 }
 
-impl Default for ToonShader {
+impl Default for ToonMaterial {
     fn default() -> Self {
-        ToonShader {
+        ToonMaterial {
             base_color: LinearRgba::WHITE,
             light_direction: Vec3::ZERO,
             light_color: LinearRgba::WHITE,
@@ -66,11 +77,12 @@ impl Default for ToonShader {
             rim_color: LinearRgba::WHITE,
             rim_threshold: 0.1,
             band_count: 0,
+            texture: None,
         }
     }
 }
 
-impl AsBindGroupShaderType<ToonShaderUniform> for ToonShader {
+impl AsBindGroupShaderType<ToonShaderUniform> for ToonMaterial {
     fn as_bind_group_shader_type(
         &self,
         _: &bevy::render::render_asset::RenderAssets<bevy::render::texture::GpuImage>,
@@ -92,7 +104,7 @@ impl AsBindGroupShaderType<ToonShaderUniform> for ToonShader {
 pub fn update_shader(
     toon_light: Single<(&DirectionalLight, &Transform), With<ToonLight>>,
     camera_position: Single<&Transform, With<ToonCamera>>,
-    mut toon: ResMut<Assets<ToonShader>>,
+    mut toon: ResMut<Assets<ToonMaterial>>,
 ) {
     let (light, transform) = toon_light.into_inner();
     let cam_transform = camera_position.into_inner().translation;

@@ -15,9 +15,20 @@ struct ToonMaterial {
 };
 
 @group(2) @binding(0) var<uniform> material: ToonMaterial;
+@group(2) @binding(1) var texture: texture_2d<f32>;
+@group(2) @binding(2) var sample: sampler;
 
 @fragment
 fn fragment(input: VertexOutput) -> @location(0) vec4<f32> {
+
+    #ifdef VERTEX_UVS_A
+        let uv = input.uv;
+    #else
+        let uv = vec2(1.0, 1.0);
+    #endif
+
+    let base_color = material.base_color * textureSample(texture, sample, uv);
+
     // shading the object
     let normal = normalize(input.world_normal); // make the world_normal of the input mesh have a length of one
     let n_dot_l = dot(material.light_direction, normal) ;
@@ -54,5 +65,5 @@ fn fragment(input: VertexOutput) -> @location(0) vec4<f32> {
     rim_intensity = smoothstep(material.rim_amount - 0.01, material.rim_amount + 0.01, rim_intensity);
     let rim = rim_intensity * material.rim_color;
 
-    return material.base_color * (material.ambient_color + light + specular + rim);
+    return base_color * (material.ambient_color + light + specular + rim);
 }
