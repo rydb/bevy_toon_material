@@ -2,7 +2,10 @@
 name = "bevy_toon_material"
 version = "0.1.0"
 edition = "2024"
-license = "MIT Or Apache-2.0"
+license = "MIT OR Apache-2.0"
+description = "A toon shader in the style of Windwaker or Breath of the Wild"
+repository = "https://github.com/AndrewDanial/bevy_toon_material"
+readme = "README.md"
 
 [dependencies]
 bevy = {version = "0.15.0", features = ["dynamic_linking"]}
