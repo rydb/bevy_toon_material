@@ -22,7 +22,7 @@ fn main() {
 fn setup(
     mut cmd: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut toon: ResMut<Assets<ToonShader>>,
+    mut toon: ResMut<Assets<ToonMaterial>>,
 ) {
     // spawn camera with the ToonCamera Component
     cmd.spawn((
@@ -35,7 +35,7 @@ fn setup(
         ToonCamera,
     ));
 
-    let toon_mat = toon.add(ToonShader::default());
+    let toon_mat = toon.add(ToonMaterial::default());
 
     // spawn a sphere and apply the material
     cmd.spawn((
