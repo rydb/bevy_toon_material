@@ -102,15 +102,21 @@ impl AsBindGroupShaderType<ToonShaderUniform> for ToonMaterial {
 }
 
 pub fn update_shader(
-    toon_light: Single<(&DirectionalLight, &Transform), With<ToonLight>>,
-    camera_position: Single<&Transform, With<ToonCamera>>,
+    toon_light: Query<(&DirectionalLight, &Transform), With<ToonLight>>,
+    camera_position: Query<&Transform, With<ToonCamera>>,
     mut toon: ResMut<Assets<ToonMaterial>>,
 ) {
-    let (light, transform) = toon_light.into_inner();
-    let cam_transform = camera_position.into_inner().translation;
+    let Ok((light, transform)) = toon_light.get_single()
+    .inspect_err(|err| debug!("{:#}", err)) else {
+        return;
+    };
+    let Ok(cam_transform) = camera_position.get_single()
+    .inspect_err(|err| debug!("{:#}", err)) else {
+        return;
+    };
     for (_, toon_shader) in toon.iter_mut() {
         toon_shader.light_direction = *transform.back();
         toon_shader.light_color = light.color.to_linear();
-        toon_shader.camera_position = cam_transform;
+        toon_shader.camera_position = cam_transform.translation;
     }
 }
